@@ -1,0 +1,83 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+int minus_value(int a,int b);
+
+struct water
+{
+    int c;//colour
+    int p;//position
+    int v;//volume
+};
+
+int main()
+{
+    int n,k;
+    scanf("%d %d",&n,&k);
+    struct water w[n];
+    //bestow position in the loop
+    for(int i=0;i<n;i++)
+    {
+        w[i].p=i;
+    }
+    //bestow colour in the loop
+    for(int i=0;i<k;i++)
+    {
+        for(int j=i;j<n;j=j+k)
+        {
+           w[j].c=i+1;
+        }
+    }
+    //bestow volume in the loop
+    for(int i=0;i<n;i++)
+    {
+        scanf("%d",&w[i].v);
+    }
+    //Execute task
+    int min_max=0;
+
+    for(int i=0;i<n;i++)
+    {
+        for(int j=i;j+k<n;j+=k)
+        {
+            if(w[j].v>w[j+k].v)
+            {
+                w[j].v-=minus_value(w[j].v,w[j+k].v);
+                w[j+k].v+=minus_value(w[j].v,w[j+k].v);
+            }
+            else if(w[j].v<w[j+k].v)
+            {
+                w[j].v+=minus_value(w[j].v,w[j+k].v);
+                w[j+k].v-=minus_value(w[j].v,w[j+k].v);
+            }
+        }
+        //search for the min in the w.c_array
+        int min=1000000;
+        for(int j=0;j<n;j++)
+        {
+            if(min>w[j].v)
+                min=w[j].v;
+        }
+        if(min>min_max)
+            min_max=min;
+    }
+    printf("%d\n",min_max);
+    //test the struct array
+    for(int i=0;i<n;i++)
+    {
+        printf("The water in cup number %d is %3d color and %3d volume\n",w[i].p,w[i].c,w[i].v);
+    }
+
+    return 0;
+}
+
+int minus_value(int a,int b)
+{
+    if((a-b)>0)
+    return (a-b)/2;
+    else
+        return (b-a)/2;
+}
+
+
