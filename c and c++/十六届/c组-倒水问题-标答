@@ -1,24 +1,34 @@
 #include <stdio.h>
 #include <limits.h>
-
+/*数学证明： 
+设颜色组中瓶子的水量为a₁, a₂, ..., aₘ 
+由于只能从左向右倒水，
+所以a₁不能增加，
+a₂不能超过(a₁+a₂)/2，
+a₃不能超过(a₁+a₂+a₃)/3，
+以此类推 
+该组的最小水量最大值，
+就是所有前缀平均值的最小值：
+min{a₁, (a₁+a₂)/2, (a₁+a₂+a₃)/3, ..., (a₁+...+aₘ)/m}
+*/
 int main() {
     int n, k;
     scanf("%d %d", &n, &k);
-    
     int a[n];
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < n; i++) 
+    {
         scanf("%d", &a[i]);
     }
-    
     long long ans = LLONG_MAX; // 初始化为最大值
-    
     // 按颜色分组处理，颜色索引为 i % k
-    for (int color = 0; color < k; color++) {
+    for (int color = 0; color < k; color++) 
+    {
         long long sum = 0; // 当前组的总水量
         int count = 0;     // 当前组的瓶子数量
         
         // 遍历当前颜色的所有瓶子
-        for (int i = color; i < n; i += k) {
+        for (int i = color; i < n; i += k) 
+        {
             sum += a[i];
             count++;
             
@@ -26,12 +36,12 @@ int main() {
             long long current_avg = sum / count;
             
             // 更新全局答案，取所有前缀平均值的最小值
-            if (current_avg < ans) {
+            if (current_avg < ans) 
+            {
                 ans = current_avg;
             }
         }
     }
-    
     printf("%lld\n", ans);
     return 0;
 }
