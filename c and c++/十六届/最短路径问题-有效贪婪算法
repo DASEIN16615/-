@@ -1,0 +1,43 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+//贪心策略
+/*"将电脑和插座分别排序后依次对应就是最短长度(不会证明)"。
+该结论可以通过反证法证明：如果存在一种匹配方式，使得总距离更小，
+但显示器和插座不是按顺序匹配的，
+那么我们可以找到两个交叉匹配，通过交换它们的匹配对象，
+使得总距离更小或相等，这与假设矛盾。*/
+
+
+// 比较函数，用于qsort排序
+int compare(const void *a, const void *b) {
+    return (*(int*)a - *(int*)b);
+}
+
+int main()
+{
+    int n;
+    scanf("%d", &n);
+    int a[n];
+    int b[n];
+
+    for (int i = 0; i < n; i++) // 读取显示器坐标
+    {
+        scanf("%d", &a[i]);
+    }
+    for (int i = 0; i < n; i++)
+    {
+        scanf("%d", &b[i]);
+    }
+    qsort(a, n, sizeof(int), compare);
+    qsort(b, n, sizeof(int), compare);
+
+    // 计算最小总长度，使用long long避免溢出
+    long long sum = 0;
+    for (int i = 0; i < n; i++) 
+    {
+        sum += abs(a[i] - b[i]);
+    }
+    printf("%lld\n", sum);
+    return 0;
+}
