@@ -1,0 +1,33 @@
+#include <stdio.h>
+
+void solve_recursive(long long a, long long b, long long c, long long k) {
+    if (k == 0 || a == b && b == c) {
+        printf("%lld %lld %lld\n", a, b, c);
+        return;
+    }
+    
+    // 保存当前值
+    long long temp_a = a;
+    long long temp_b = b;
+    long long temp_c = c;
+    
+    // 计算新值
+    a = (temp_b + temp_c) / 2;
+    b = (temp_a + temp_c) / 2;
+    c = (temp_a + temp_b) / 2;
+    
+    solve_recursive(a, b, c, k - 1);
+}
+
+int main() {
+    int t;
+    scanf("%d", &t);
+    
+    for (int i = 0; i < t; i++) {
+        long long a, b, c, k;
+        scanf("%lld %lld %lld %lld", &a, &b, &c, &k);
+        solve_recursive(a, b, c, k);
+    }
+    
+    return 0;
+}
