@@ -1,0 +1,47 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+#include <math.h>
+
+int compare(const void *a, const void *b) 
+{
+    return *(long long*)a - *(long long*)b;
+}
+
+int main() 
+{
+    int n, m;
+    scanf("%d %d", &n, &m);
+    
+    long long a[100005], s[100005];
+    for (int i = 1; i <= n; i++) 
+    {
+        scanf("%lld", &a[i]);
+    }
+    
+    qsort(a + 1, n, sizeof(long long), compare);
+    
+    // 预处理相邻平方差
+    for (int i = 1; i < n; i++) 
+    {
+        s[i] = llabs(a[i+1]*a[i+1] - a[i]*a[i]);
+    }
+    
+    m--; // 需要m-1个相邻差
+    int i = 1, j = 1;
+    long long ans = 0, sum = LLONG_MAX;
+    
+    for (j = 1; j < n; j++) 
+    {
+        ans += s[j];
+        if (j - i + 1 == m) 
+        {
+            if (ans < sum) sum = ans;
+            ans -= s[i];
+            i++;
+        }
+    }
+    
+    printf("%lld\n", sum);
+    return 0;
+}
