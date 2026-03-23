@@ -15,6 +15,7 @@
 计算冗余：每次重新计算连续m-1个相邻差的和，而非利用滑动窗口
 
 没有利用数学性质：没有使用L = Bₘ² - B₁²的直接计算公式
+##可优化为快速排序
 */
 long long calculate(long long a,long long b);
 void sort(long long *a,int n);
