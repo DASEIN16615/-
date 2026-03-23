@@ -1,0 +1,33 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+
+int compare(const void *a, const void *b) 
+{
+    return *(long long*)a - *(long long*)b;
+}
+
+int main() 
+{
+    int n, m;
+    scanf("%d %d", &n, &m);
+    
+    long long a[100005];
+    for (int i = 0; i < n; i++) 
+    {
+        scanf("%lld", &a[i]);
+        a[i] = a[i] * a[i]; // 预处理平方值
+    }
+    
+    qsort(a, n, sizeof(long long), compare);
+    
+    long long ans = LLONG_MAX;
+    for (int i = 0; i <= n - m; i++) 
+    {
+        long long diff = a[i + m - 1] - a[i];//望远镜级数
+        if (diff < ans) ans = diff;
+    }
+    
+    printf("%lld\n", ans);
+    return 0;
+}
