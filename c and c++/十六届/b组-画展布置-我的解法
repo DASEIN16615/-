@@ -1,0 +1,69 @@
+#include<stdio.h>
+#include<stdlib.h>
+/**********算法练习**********/
+/*
+蓝桥杯十六届b组画展布置
+*/
+//提示1：注意数组角标要全面且不越界
+//提示2：注意数据类型
+//注意：一个测试点时间超出限度
+long long calculate(long long a,long long b);
+void sort(long long *a,int n);
+
+int main()
+{
+    int n,m;
+    scanf("%d%d",&n,&m);
+    long long a[n];
+    for(int i=0;i<n;i++)
+    {
+        scanf("%lld",&a[i]);
+    }
+    sort(a,n);
+    long long d[n-1];//差分数列
+    for(int i=0;i<n-1;i++)
+    {
+        d[i]=calculate(a[i],a[i+1]);//d的下标小于等于n-2
+    }
+    long long min=1000000000000000;//初始值要足够大
+    for(int i=0;i<n-m+1;i++)
+    {
+        long long sum=0;
+        for(int j=i;j<m+i-1;j++)
+        {
+            sum+=d[j];
+        }
+        if(sum<min)
+        {
+            min=sum;
+        }
+    }
+    printf("%lld\n",min);
+    return 0;
+}
+void sort(long long *a,int n)
+{
+    for(int i=0;i<n-1;i++)
+    {
+        for(int j=0;j<n-1-i;j++)
+        {
+            if(a[j]>a[j+1])
+            {
+                long long temp=a[j];
+                a[j]=a[j+1];
+                a[j+1]=temp;
+            }
+        }
+    }
+}
+
+long long calculate( long long a,long long b)
+{
+    long long sum=0;
+    if(a>b)
+    sum=a*a-b*b;
+    else
+    sum=b*b-a*a;
+    return sum;
+}
+
