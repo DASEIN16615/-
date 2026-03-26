@@ -1,0 +1,145 @@
+#include <stdio.h>
+#include <string.h>
+#include <limits.h>
+
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+
+int main() 
+{
+    // 读取输入
+    char row1[1000005], row2[1000005];
+    scanf("%s%s", row1, row2);
+    int n = strlen(row1);
+    
+    // 预处理：记录每一列的状态
+    // 状态编码：0-无检测器，1-只有上行有，2-只有下行有，3-上下都有
+    int state[1000005];
+    int has_detector[1000005];  // 标记哪些列有检测器
+    int detector_cols[1000005]; // 存储有检测器的列索引
+    int m = 0;  // 有检测器的列数
+    
+    for (int i = 0; i < n; i++) 
+    {
+        state[i] = 0;
+        if (row1[i] == '#') state[i] = 1;  // 第一行
+        if (row2[i] == '#') state[i] = 2;  // 第二行
+        
+        if (state[i] > 0) 
+        {
+            has_detector[i] = 1;
+            detector_cols[m++] = i;
+        } 
+        else 
+        {
+            has_detector[i] = 0;
+        }
+    }
+    
+    // 特殊情况处理
+    if (m == 0) 
+    {
+        printf("0\n");  // 没有检测器，不需要添加
+        return 0;
+    }
+    if (m == 1) 
+    {
+        printf("0\n");  // 只有一个检测器，已经连通
+        return 0;
+    }
+    
+    // DP数组：dp[i][s] 表示处理到第i个有检测器的列，且该列状态为s时的最小添加数
+    // s的取值范围：1,2,3 分别表示只有上行、只有下行、上下都有
+    // 由于n最大10^6，但m<=2n，使用滚动数组优化空间
+    int dp[3][4];  // dp[0]表示前一列，dp[1]表示当前列
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 4; j++) {
+            dp[i][j] = INT_MAX;
+        }
+    }
+    
+    // 初始化第一个有检测器的列
+    int first_col = detector_cols[0];
+    int first_state = state[first_col];
+    
+    // 第一个列必须保持原有检测器，但可以添加额外的检测器
+    for (int s = 1; s <= 3; s++) {
+        if ((s & first_state) == first_state) {  // 新状态必须包含原有检测器
+            // 计算需要添加的检测器数
+            int add_cost = 0;
+            if ((s & 1) && !(first_state & 1)) add_cost++;  // 需要在上行添加
+            if ((s & 2) && !(first_state & 2)) add_cost++;  // 需要在下行添加
+            dp[0][s] = add_cost;
+        }
+    }
+    
+    // DP处理后续有检测器的列
+    for (int idx = 1; idx < m; idx++) {
+        int cur_col = detector_cols[idx];
+        int prev_col = detector_cols[idx-1];
+        int cur_state = state[cur_col];
+        
+        // 初始化当前列的DP值为无穷大
+        for (int s = 1; s <= 3; s++) {
+            dp[1][s] = INT_MAX;
+        }
+        
+        // 枚举当前列的可能状态
+        for (int cur_s = 1; cur_s <= 3; cur_s++) {
+            if ((cur_s & cur_state) != cur_state) continue;  // 必须包含原有检测器
+            
+            // 计算达到cur_s需要添加的检测器数
+            int add_cur = 0;
+            if ((cur_s & 1) && !(cur_state & 1)) add_cur++;
+            if ((cur_s & 2) && !(cur_state & 2)) add_cur++;
+            
+            // 枚举上一列的状态
+            for (int prev_s = 1; prev_s <= 3; prev_s++) {
+                if (dp[0][prev_s] == INT_MAX) continue;
+                
+                // 检查两列是否能连通
+                if ((cur_s & prev_s) == 0) continue;  // 没有公共行，不能直接连通
+                
+                // 计算连接两列需要添加的检测器数
+                int distance = cur_col - prev_col - 1;  // 两列之间的空白列数
+                
+                // 连接策略：在中间的每一列添加一个检测器，放在两列共有的行上
+                // 如果两列在某一行都有检测器，那么可以在该行上连接
+                int connect_cost = 0;
+                if (distance > 0) {
+                    // 找到两列共有的行
+                    int common_row = cur_s & prev_s;
+                    if (common_row == 1 || common_row == 2) {
+                        // 只有一行共有，在中间的每一列该行添加检测器
+                        connect_cost = distance;
+                    } else if (common_row == 3) {
+                        // 两行都共有，可以选择任意一行连接，选择添加检测器数少的
+                        // 实际上选择任意一行都可以，因为添加数相同
+                        connect_cost = distance;
+                    }
+                }
+                
+                // 总代价 = 前一列的代价 + 连接代价 + 当前列添加代价
+                int total_cost = dp[0][prev_s] + connect_cost + add_cur;
+                if (total_cost < dp[1][cur_s]) {
+                    dp[1][cur_s] = total_cost;
+                }
+            }
+        }
+        
+        // 将当前列的DP值复制到前一列，为下一次迭代准备
+        for (int s = 1; s <= 3; s++) {
+            dp[0][s] = dp[1][s];
+        }
+    }
+    
+    // 找到最小值
+    int ans = INT_MAX;
+    for (int s = 1; s <= 3; s++) {
+        if (dp[0][s] < ans) {
+            ans = dp[0][s];
+        }
+    }
+    
+    printf("%d\n", ans);
+    return 0;
+}
