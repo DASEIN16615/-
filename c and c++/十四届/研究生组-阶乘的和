@@ -1,0 +1,52 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <climits>
+using namespace std;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(0);
+    
+    int n;
+    cin >> n;
+    
+    vector<int> a(n);
+    int min_val = INT_MAX;
+    for (int i = 0; i < n; i++) {
+        cin >> a[i];
+        if (a[i] < min_val) {
+            min_val = a[i];
+        }
+    }
+    
+    // 统计最小值出现的次数
+    long long count_min = 0; // 用 long long 避免溢出
+    for (int x : a) {
+        if (x == min_val) {
+            count_min++;
+        }
+    }
+    
+    // 处理边界情况
+    if (min_val == 0) {
+        // 0! = 1，1 能整除任何数
+        // 检查 1! = 1 是否整除 S
+        // 实际上 1 能整除任何数，所以至少 m = 1
+        // 但需要检查更大的 m
+        cout << 1 << '\n';
+        return 0;
+    }
+    
+    // 检查 min_val + 1 是否能整除 count_min
+    // 使用 long long 避免溢出
+    long long divisor = (long long)min_val + 1;
+    
+    if (count_min % divisor == 0) {
+        cout << min_val + 1 << '\n';
+    } else {
+        cout << min_val << '\n';
+    }
+    
+    return 0;
+}
